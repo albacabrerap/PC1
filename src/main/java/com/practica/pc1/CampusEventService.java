@@ -19,17 +19,18 @@ public class CampusEventService {
 
     public EventResponseDto createevent(EventRequestDto dto){
         CampusEvent campusEvent= mapper.map(dto, CampusEvent.class);
+        campusEvent.setStatus("DRAFT");
         return mapper.map(eventRepository.save(campusEvent),EventResponseDto.class);
     }
-    public EventResponseDto publish(Long id, String status){
-        CampusEvent event=eventRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("NotFound"));
-        event.setStatus(status);
+    public EventResponseDto publish(Long id){
+        CampusEvent event=eventRepository.findById(id).orElseThrow(()->new EventNotFoundException("NotFound"));
+        event.setStatus("PUBLISHED");
         return mapper.map(event, EventResponseDto.class);
     }
 
     public Page<EventResponseDto> getAllEvents(Pageable pageable) {
-        Page<CampusEvent> eventsPage = eventRepository.findAll(pageable);
-        
+        Page<CampusEvent> eventsPage = eventRepository.findAllEventsWithStatusPublished(pageable);
         return eventsPage.map(product -> mapper.map(product, EventResponseDto.class));
     }
+
 }

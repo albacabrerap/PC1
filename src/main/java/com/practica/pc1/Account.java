@@ -20,6 +20,7 @@ public class Account implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="userId")
     private Long id;
 
     @Email

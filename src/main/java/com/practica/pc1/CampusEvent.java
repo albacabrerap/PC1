@@ -21,6 +21,7 @@ public class CampusEvent {
     @Column(name="eventId")
     private Long id;
 
+    @JoinColumn(referencedColumnName = "userId")
     private Long organizerid;
 
     @NotNull

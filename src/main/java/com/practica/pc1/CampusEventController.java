@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZonedDateTime;
+
 @Controller
 @RequestMapping("/events")
 public class CampusEventController {
@@ -21,23 +23,21 @@ public class CampusEventController {
         this.service=service;
     }
 
+    @PreAuthorize("hasRole('ORGANIZER') or hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<EventResponseDto> postEvent(@RequestBody @Valid EventRequestDto dto){
         return ResponseEntity.ok(service.createevent(dto));
     }
 
-
+    @PreAuthorize("hasRole('ORGANIZER') or hasRole('ADMIN')")
     @PatchMapping("/{eventId}/publish")
-    public ResponseEntity<EventResponseDto> publishEvent(@PathParam("eventId") Long id, @RequestParam String newStatus){
-        return ResponseEntity.ok(service.publish(id,newStatus));
+    public ResponseEntity<EventResponseDto> publishEvent(@PathParam("eventId") Long id){
+        return ResponseEntity.ok(service.publish(id));
     }
 
-    @PreAuthorize("ROLE_ORGANIZER")
     @GetMapping
-    public ResponseEntity<PagedResponseDto<EventResponseDto>> getAllProducts(
-            @PageableDefault(page = 0, size = 10) Pageable pageable) {
-
-        Page<EventResponseDto> productsPage = service.getAllProducts(pageable);
+    public ResponseEntity<PagedResponseDto<EventResponseDto>> getAllEvents(@RequestParam String category, @RequestParam(required = false)ZonedDateTime from, @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        Page<EventResponseDto> productsPage = service.getAllEvents(pageable);
         PagedResponseDto<EventResponseDto> responseDto = new PagedResponseDto<>(productsPage);
         return ResponseEntity.ok(responseDto);
     }
